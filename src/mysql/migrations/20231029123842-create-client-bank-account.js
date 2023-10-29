@@ -10,18 +10,23 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
       },
       clientId: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       bankName: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       branchName: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       accountNumber: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       accountName: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {
