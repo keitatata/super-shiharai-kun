@@ -2,10 +2,12 @@ const express = require('express')
 const createError = require('http-errors')
 const app = express()
 const port = 8080;
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
+// view engine setup
 app.get('/ping', (req, res)=> {
     res.json({ "status": "ok"});
     res.end();
