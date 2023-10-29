@@ -1,4 +1,5 @@
 'use strict';
+const { INVOICE_STATUS } = require('../../shared/constant');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -47,7 +48,7 @@ module.exports = {
       },
       status: {
         allowNull: false,
-        type: Sequelize.ENUM('pending', 'processing', 'completed', 'error')
+        type: Sequelize.ENUM(Object.values(INVOICE_STATUS))
       },
       paymentDeadline: {
         allowNull: false,
