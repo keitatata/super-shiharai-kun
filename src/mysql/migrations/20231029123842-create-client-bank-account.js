@@ -2,26 +2,26 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('s', {
-      id: {
+    await queryInterface.createTable('ClientBankAccounts', {
+      clientBankAccountId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
-      name: {
+      clientId: {
         type: Sequelize.STRING
       },
-      representativeName: {
+      bankName: {
         type: Sequelize.STRING
       },
-      phone: {
+      branchName: {
         type: Sequelize.STRING
       },
-      postCode: {
+      accountNumber: {
         type: Sequelize.STRING
       },
-      address: {
+      accountName: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -35,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('s');
+    await queryInterface.dropTable('ClientBankAccounts');
   }
 };
