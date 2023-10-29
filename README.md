@@ -6,10 +6,10 @@
 $ docker-compose up
 ```
 
-### モデルの反映
+### モデルマイグレーション
 
 ```sh
-npx sequelize-cli db:migrate --env local
+npm run migrate
 ```
 
 ### seedデータの挿入
@@ -19,3 +19,15 @@ npx sequelize-cli db:migrate --env local
 mysql -u user -h 127.0.0.1 -ppassword --port 3306
 ```
 
+## undo
+```
+ npx sequelize-cli db:migrate:undo:all --to 20231029123812-create-company.js --env local
+```
+ ## seed反映
+```
+  npx sequelize-cli db:seed:all --env local
+```
+ ## seed削除
+```
+ npx sequelize-cli db:seed:undo:all --env local
+```
