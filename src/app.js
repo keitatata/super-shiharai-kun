@@ -80,13 +80,13 @@ app.post('/api/invoices', async (req, res) => {
     res.status(400).json({ message: 'client is not found.' });
     return;
   }
-  await invoiceRepository.create({
+  const invoice = await invoiceRepository.create({
     companyId: user.companyId,
     now,
     clientId,
     paymentAmount,
   });
-  res.status(200).end();
+  res.json(invoice);
 })
 
 // view engine setup
@@ -109,3 +109,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+module.exports = app;
