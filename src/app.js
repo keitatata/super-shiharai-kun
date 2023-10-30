@@ -4,15 +4,8 @@ const app = express()
 const port = 8080;
 const clientRepository = require('./shared/repositories/clients');
 const invoiceRepository = require('./shared/repositories/invoices');
-const dayjs = require('dayjs');
-const timezone = require('dayjs/plugin/timezone');
-const utc = require('dayjs/plugin/utc');
 const { DEFAULT_LIMIT, DEFAULT_OFFSET, INVOICE_STATUS, DEFAULT_TIME_ZONE, TAX_RATE, COMISSION_RATE } = require('./shared/constant');
 const { passwordVerify, addNow } = require('./shared/middlewares');
-const uuid = require('uuid');
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.tz.setDefault(DEFAULT_TIME_ZONE);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
@@ -52,28 +45,12 @@ app.post('/api/invoices', async (req, res) => {
     res.status(400).json({ message: 'client is not found.' });
     return;
   }
-  // 支払金額 に手数料4%を加えたものに更に手数料の消費税を加えたものを請求金額とする
-  const invoiceAmount = paymentAmount + (paymentAmount * COMISSION_RATE * (1 + TAX_RATE));
-  // 請求金額の4%を手数料とする
-  const commission = paymentAmount * COMISSION_RATE;
-  // 手数料の消費税を計算する
-  const tax = commission * TAX_RATE;
-  const params = {
-    invoiceId: uuid.v4(),
+  await invoiceRepository.create({
     companyId: user.companyId,
+    now,
     clientId,
-    issuedAt: dayjs(now).toDate(),
-    commission,
-    commissionRate: COMISSION_RATE,
-    tax,
-    taxRate: TAX_RATE,
-    invoiceAmount,
     paymentAmount,
-    status: INVOICE_STATUS.pending,
-    // 支払い期限は発行日から1ヶ月後とする
-    paymentDeadline: dayjs(now).add(1, 'month').endOf('day').toDate(),
-  };
-  await invoiceRepository.create(params);
+  });
   res.status(201).end();
 })
 
