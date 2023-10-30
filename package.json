@@ -7,7 +7,7 @@
     "start": "npx nodemon ./src/app.js",
     "migrate": "npx sequelize-cli db:migrate --env local",
     "migrate:undo": "npx sequelize-cli db:migrate:undo --env local",
-    "test": "jest --forceExit --runInBand"
+    "test": "SERVICE_PORT=8090 jest --forceExit --runInBand"
   },
   "author": "",
   "license": "ISC",

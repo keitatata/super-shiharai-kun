@@ -15,9 +15,9 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault(DEFAULT_TIME_ZONE);
 const expressErrorhandlers = require('express-errorhandlers');
 const logger = require('morgan');
-const {errorHandler, notFound, skipOkHandler} = expressErrorhandlers.middleware;
+const { errorHandler } = expressErrorhandlers.middleware;
 
-app.listen(port, () => {
+app.listen(process.env['SERVICE_PORT'] || port, () => {
   console.log(`Server running on port ${port}`);
 });
 app.use(logger('combined'));
