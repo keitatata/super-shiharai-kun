@@ -43,6 +43,14 @@ curl --location 'http://localhost:8080/api/invoices' \
 --header 'password: password1' \
 --header 'email: test@example.com'
 ```
+#### 使用可能なクエリパラメータ
+| パラメータ名 | 説明                           | フォーマット | 例                | 
+| ------------ | ------------------------------ | ------------ | ----------------- | 
+| limit        | 取得するデータの件数           | number       | 3                 | 
+| offset       | スキップするデータの件数       | number       | 2                 | 
+| startDate    | 支払い期限を指定する際の開始日 | 'YYYY-MM-DD' | 2023-10-01        | 
+| endDate      | 支払い期限を指定する際の終了日 | 'YYYY-MM-DD' | 2023-10-31        | 
+| statuses     | 請求書のステータス             | string[]     | pending,completed | 
 
 ### 請求書作成
 ```sh
