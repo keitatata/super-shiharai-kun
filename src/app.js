@@ -4,8 +4,15 @@ const app = express()
 const port = 8080;
 const clientRepository = require('./shared/repositories/clients');
 const invoiceRepository = require('./shared/repositories/invoices');
-const { DEFAULT_LIMIT, DEFAULT_OFFSET, INVOICE_STATUS, DEFAULT_TIME_ZONE, TAX_RATE, COMISSION_RATE } = require('./shared/constant');
+const { DEFAULT_LIMIT, DEFAULT_OFFSET, DEFAULT_TIME_ZONE } = require('./shared/constant');
 const { passwordVerify, addNow } = require('./shared/middlewares');
+const Op = require('sequelize').Op;
+const dayjs = require('dayjs');
+const timezone = require('dayjs/plugin/timezone');
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault(DEFAULT_TIME_ZONE);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
@@ -21,11 +28,39 @@ app.use(express.urlencoded({
 
 // 請求書一覧取得
 app.get('/api/invoices', async (req, res) => {
-  const { limit = DEFAULT_LIMIT, offset = DEFAULT_OFFSET } = req.query;
-  const { companyId } = req._context.user
+  const { limit = DEFAULT_LIMIT, offset = DEFAULT_OFFSET, startDate, endDate, statuses } = req.query;
+  const { companyId } = req._context.user;
+  const conditions = { companyId };
+  // startDateがendDateよりも後の日付の場合はエラー
+  const isValidDate = startDate && endDate ? dayjs(startDate).isBefore(dayjs(endDate)) : true;
+  if (!isValidDate) {
+    res.status(400).json({ message: 'invalid request.' });
+    return;
+  }
+  // startDateが指定されている場合は条件に追加
+  if (startDate) {
+    conditions.paymentDeadline = { [Op.gte]: dayjs(startDate).toDate() };
+  }
+  // endDateが指定されている場合は条件に追加
+  if (endDate) {
+    if (conditions.paymentDeadline) {
+      conditions.paymentDeadline = {
+        [Op.and]: [
+          conditions.paymentDeadline,
+          { [Op.lte]: dayjs(endDate).endOf('day').toDate() },
+        ],
+      };
+    } else {
+      conditions.paymentDeadline = { [Op.lte]: dayjs(endDate).endOf('day').toDate() };
+    }
+  }
+  // statusが指定されている場合は条件に追加
+  if (statuses) {
+    conditions.status = { [Op.in]: statuses.split(',') };
+  }
 
   // ユーザーが所属している企業の請求書で絞る
-  const invoices = await invoiceRepository.findAll({ where: { companyId }, limit, offset });
+  const invoices = await invoiceRepository.findAll({ where: conditions, limit: Number(limit), offset: Number(offset), raw: true });
   res.json(invoices);
 })
 
@@ -51,7 +86,7 @@ app.post('/api/invoices', async (req, res) => {
     clientId,
     paymentAmount,
   });
-  res.status(201).end();
+  res.status(200).end();
 })
 
 // view engine setup
