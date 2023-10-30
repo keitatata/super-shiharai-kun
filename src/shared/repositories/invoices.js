@@ -22,7 +22,7 @@ const findAll = async (conditions = {}) => {
  * @param {string} params.companyId
  * @param {number} params.paymentAmount
  * @param {number} params.now
- * @return {Promise<void>}
+ * @return {Promise<Invoice>}
  */
 const create = async (params) => {
   const { companyId, now, clientId, paymentAmount } = params;

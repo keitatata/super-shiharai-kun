@@ -6,6 +6,7 @@ const userRepository = require('../src/shared/repositories/users');
 const clientRepository = require('../src/shared/repositories/clients');
 const bcrypt = require('bcrypt');
 const assert = require('assert');
+const { DEFAULT_LIMIT, DEFAULT_OFFSET } = require('../src/shared/constant');
 const email = 'test@example.com';
 const password = 'password1'
 const defaultHeader = { email, password };
@@ -22,6 +23,66 @@ describe('test', () => {
   });
   describe('GET: /api/invoices', () => {
     it('請求書一覧取得をすることができる', async () => {
+      const companyId = 'fe8e9c4e-8ee6-4903-8b84-be57fh4b29340';
+      sinon.mock(userRepository).expects('findOneByEmail').resolves(
+        {
+          companyId,
+          userId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
+          email: 'test@example.com',
+          password: 'disfdsfjdsfdsfjdsf5jn',
+          createdAt: '2023-08-30 17:41:54',
+          updatedAt: '2023-08-30 17:41:54'
+        }
+      );
+      sinon.mock(bcrypt).expects('compareSync').returns(true);
+      sinon.mock(invoiceRepository)
+        .expects('findAll')
+        .withExactArgs({ where: { companyId }, limit: DEFAULT_LIMIT, offset: DEFAULT_OFFSET, raw: true })
+        .resolves(
+          {
+            count: 2,
+            rows: [
+              {
+                invoiceId: '12fe7fdf-1786-4620-b91b-242a69cc6113',
+                clientId: 'fe38e892-014a-45a7-a35b-8f21ab30b874',
+                companyId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
+                issuedAt: '2023-10-30T12:36:05.000Z',
+                commission: 401,
+                commissionRate: 0,
+                tax: 41,
+                taxRate: 0,
+                invoiceAmount: 10442,
+                paymentAmount: 10001,
+                status: 'pending',
+                paymentDeadline: '2023-12-30T23:59:59.000Z',
+                createdAt: '2023-10-30T12:36:05.000Z',
+                updatedAt: '2023-10-30T12:36:05.000Z'
+              },
+              {
+                invoiceId: '3fe8b1cb-4681-48c7-bb84-b24b62b5e289',
+                clientId: 'fe38e892-014a-45a7-a35b-8f21ab30b874',
+                companyId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
+                issuedAt: '2023-10-30T12:36:00.000Z',
+                commission: 401,
+                commissionRate: 0,
+                tax: 41,
+                taxRate: 0,
+                invoiceAmount: 10442,
+                paymentAmount: 10001,
+                status: 'pending',
+                paymentDeadline: '2023-12-30T23:59:59.000Z',
+                createdAt: '2023-10-30T12:36:00.000Z',
+                updatedAt: '2023-10-30T12:36:00.000Z'
+              }
+            ]
+          }
+        );
+      const res = await request(app).get('/api/invoices').set(defaultHeader);
+      assert.strictEqual(res.status, 200);
+      assert.strictEqual(res.body.count, 2);
+      assert.strictEqual(res.body.rows.length, 2);
+    });
+    it('startDateがendDateよりも後の日付の場合はエラーになる', async () => {
 
       sinon.mock(userRepository).expects('findOneByEmail').resolves(
         {
@@ -34,49 +95,10 @@ describe('test', () => {
         }
       );
       sinon.mock(bcrypt).expects('compareSync').returns(true);
-      sinon.mock(invoiceRepository).expects('findAll').resolves(
-        {
-          count: 2,
-          rows: [
-            {
-              invoiceId: '12fe7fdf-1786-4620-b91b-242a69cc6113',
-              clientId: 'fe38e892-014a-45a7-a35b-8f21ab30b874',
-              companyId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
-              issuedAt: '2023-10-30T12:36:05.000Z',
-              commission: 401,
-              commissionRate: 0,
-              tax: 41,
-              taxRate: 0,
-              invoiceAmount: 10442,
-              paymentAmount: 10001,
-              status: 'pending',
-              paymentDeadline: '2023-12-30T23:59:59.000Z',
-              createdAt: '2023-10-30T12:36:05.000Z',
-              updatedAt: '2023-10-30T12:36:05.000Z'
-            },
-            {
-              invoiceId: '3fe8b1cb-4681-48c7-bb84-b24b62b5e289',
-              clientId: 'fe38e892-014a-45a7-a35b-8f21ab30b874',
-              companyId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
-              issuedAt: '2023-10-30T12:36:00.000Z',
-              commission: 401,
-              commissionRate: 0,
-              tax: 41,
-              taxRate: 0,
-              invoiceAmount: 10442,
-              paymentAmount: 10001,
-              status: 'pending',
-              paymentDeadline: '2023-12-30T23:59:59.000Z',
-              createdAt: '2023-10-30T12:36:00.000Z',
-              updatedAt: '2023-10-30T12:36:00.000Z'
-            }
-          ]
-        }
-      );
-      const res = await request(app).get('/api/invoices').set(defaultHeader);
-      assert.strictEqual(res.status, 200);
-      assert.strictEqual(res.body.count, 2);
-      assert.strictEqual(res.body.rows.length, 2);
+      const res = await request(app).get('/api/invoices')
+        .query({ startDate: '2023-10-02', endDate: '2023-10-01' })
+        .set(defaultHeader);
+      assert.strictEqual(res.status, 400);
     });
   });
   describe('POST: /api/invoices', () => {
@@ -140,6 +162,82 @@ describe('test', () => {
       });
       assert.strictEqual(res.status, 200);
       assert.strictEqual(res.body.invoiceId, '12fe7fdf-1786-4620-b91b-242a69cc6113');
+    });
+    it('bodyで指定したclientIdがstringではない場合、エラーになる', async () => {
+      const now = new Date('2023-10-30T00:00:00.000Z')
+      sinon.useFakeTimers(now);
+      const companyId = 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40';
+      const paymentAmount = 10000;
+      sinon.mock(userRepository).expects('findOneByEmail').resolves(
+        {
+          companyId,
+          userId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
+          email: 'test@example.com',
+          password: 'disfdsfjdsfdsfjdsf5jn',
+          createdAt: '2023-08-30 17:41:54',
+          updatedAt: '2023-08-30 17:41:54'
+        }
+      );
+      sinon.mock(bcrypt).expects('compareSync').returns(true);
+
+      const res = await request(app).post('/api/invoices').set(defaultHeader).send({
+        clientId: 12345,
+        paymentAmount
+      });
+      assert.strictEqual(res.status, 400);
+      assert.strictEqual(res.body.message, 'invalid request body param');
+    });
+    it('bodyで指定したpaymentAmountがnumberではない場合、エラーになる', async () => {
+      const now = new Date('2023-10-30T00:00:00.000Z')
+      sinon.useFakeTimers(now);
+      const clientId = 'fe38e892-014a-45a7-a35b-8f21ab30b874';
+      const companyId = 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40';
+      sinon.mock(userRepository).expects('findOneByEmail').resolves(
+        {
+          companyId,
+          userId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
+          email: 'test@example.com',
+          password: 'disfdsfjdsfdsfjdsf5jn',
+          createdAt: '2023-08-30 17:41:54',
+          updatedAt: '2023-08-30 17:41:54'
+        }
+      );
+      sinon.mock(bcrypt).expects('compareSync').returns(true);
+
+      const res = await request(app).post('/api/invoices').set(defaultHeader).send({
+        clientId,
+        paymentAmount: '10000'
+      });
+      assert.strictEqual(res.status, 400);
+      assert.strictEqual(res.body.message, 'invalid request body param');
+    });
+    it('bodyで指定したclientIdに紐づく取引先情報が存在しない場合、エラーになる', async () => {
+      const now = new Date('2023-10-30T00:00:00.000Z')
+      sinon.useFakeTimers(now);
+      const clientId = 'fe38e892-014a-45a7-a35b-8f21ab30b874';
+      const companyId = 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40';
+      const paymentAmount = 10000;
+      sinon.mock(userRepository).expects('findOneByEmail').resolves(
+        {
+          companyId,
+          userId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
+          email: 'test@example.com',
+          password: 'disfdsfjdsfdsfjdsf5jn',
+          createdAt: '2023-08-30 17:41:54',
+          updatedAt: '2023-08-30 17:41:54'
+        }
+      );
+      sinon.mock(bcrypt).expects('compareSync').returns(true);
+
+      sinon.mock(clientRepository).expects('findOne').withExactArgs({ where: { clientId, companyId }, raw: true }).resolves(
+        null
+      );
+      const res = await request(app).post('/api/invoices').set(defaultHeader).send({
+        clientId,
+        paymentAmount
+      });
+      assert.strictEqual(res.status, 400);
+      assert.strictEqual(res.body.message, 'client is not found.');
     });
   });
 });
