@@ -4,13 +4,20 @@ const app = express()
 const port = 8080;
 const invoiceRepository = require('./shared/repositories/invoices');
 const { DEFAULT_LIMIT, DEFAULT_OFFSET } = require('./shared/constant');
+const { passwordVerify } = require('./shared/middlewares');
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
+app.use(passwordVerify)
+
 app.get('/api/invoices', async (req, res) => {
   const { limit = DEFAULT_LIMIT, offset = DEFAULT_OFFSET } = req.query;
-  const invoices = await invoiceRepository.findAll({where: {invoiceId: 'f9e1a133-d79a-4000-b0a9-8b7ffa11a320'}, limit, offset});
+  const { companyId } = req._context.user
+
+  // ユーザーが所属している企業の請求書で絞る
+  const invoices = await invoiceRepository.findAll({ where: { companyId }, limit, offset });
   res.json(invoices);
 })
 
