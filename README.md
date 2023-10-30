@@ -1,33 +1,53 @@
 # super-shiharai-kun
 
-## Quick Start
-### サーバー起動
+## 🚗 Quick Start
+apiを実行可能な状態にします。
+### 1.サーバー起動
 ```sh
 $ docker-compose up
 ```
-
-### モデルマイグレーション
+### 2.モデルマイグレーション
 
 ```sh
 npm run migrate
 ```
 
-### seedデータの挿入
+### 3.seedデータ反映
+```
+  npx sequelize-cli db:seed:all --env localHost
+```
+
+## apiサンプル
+### 死活監視
+```sh
+curl --location 'http://localhost:8080/ping'
+```
+
+### 請求書一覧取得
+```sh
+curl --location 'http://localhost:8080/api/invoices' \
+--header 'password: password1' \
+--header 'email: test@example.com'
+```
+
+### 請求書作成
+```sh
+curl --location 'http://localhost:8080/api/invoices' \
+--header 'password: password1' \
+--header 'email: test@example.com' \
+--header 'Content-Type: application/json' \
+--data '{
+    "clientId": "fe38e892-014a-45a7-a35b-8f21ab30b874",
+    "paymentAmount": 10000
+}'
+```
+## その他
+### テスト実行
+```sh
+npm run test
+```
 
 ## DBへの接続
 ```sh
 mysql -u user -h 127.0.0.1 -ppassword --port 3306
-```
-
-## undo
-```
- npx sequelize-cli db:migrate:undo:all --to 20231029123812-create-company.js --env local
-```
- ## seed反映
-```
-  npx sequelize-cli db:seed:all --env local
-```
- ## seed削除
-```
- npx sequelize-cli db:seed:undo:all --env local
 ```
