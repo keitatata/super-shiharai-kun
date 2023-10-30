@@ -10,10 +10,14 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      ClientBankAccount.belongsTo(models.Client);
+      ClientBankAccount.belongsTo(models.Client, {foreignKey: 'clientId', as: 'Client'});
     }
   }
   ClientBankAccount.init({
+    clientBankAccountId: {
+      type: DataTypes.UUID,
+      primaryKey: true
+    },
     clientId: DataTypes.STRING,
     bankName: DataTypes.STRING,
     branchName: DataTypes.STRING,
