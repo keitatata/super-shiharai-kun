@@ -21,6 +21,16 @@ npm run migrate
 npx sequelize-cli db:seed:all --env localHost
 ```
 
+## 主な使用技術
+### 言語
+javascript(nodejs v20)
+### DB
+mysql 5.7
+### ライブラリ
+express v4, sequelize v6
+### テスト
+jest, sinon, supertest
+
 ## apiサンプル
 ### 死活監視
 ```sh
@@ -51,7 +61,7 @@ curl --location 'http://localhost:8080/api/invoices' \
 npm run test
 ```
 
-## DBへの接続
+### DBへの接続
 ```sh
 mysql -u user -h 127.0.0.1 -ppassword --port 3306
 ```
