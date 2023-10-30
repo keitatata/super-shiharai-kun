@@ -5,6 +5,12 @@ const bcrypt = require('bcrypt');
  * パスワード検証のmiddleware
  */
 const passwordVerify = async (req, res, next) => {
+  const ignorePaths = ['/ping'];
+  // ignorePathsに含まれるパスは認証をスキップする
+  if (ignorePaths.includes(req.path)) {
+    next()
+    return
+  }
   const { password, email } = req.headers;
   // ヘッダーにpasswordとemailがなければエラー
   if (!password || !email) {
