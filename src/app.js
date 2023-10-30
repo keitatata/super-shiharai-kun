@@ -54,8 +54,10 @@ app.post('/api/invoices', async (req, res) => {
   }
   // 支払金額 に手数料4%を加えたものに更に手数料の消費税を加えたものを請求金額とする
   const invoiceAmount = paymentAmount + (paymentAmount * COMISSION_RATE * (1 + TAX_RATE));
-  const tax = invoiceAmount * TAX_RATE;
-  const commission = invoiceAmount * COMISSION_RATE;
+  // 請求金額の4%を手数料とする
+  const commission = paymentAmount * COMISSION_RATE;
+  // 手数料の消費税を計算する
+  const tax = commission * TAX_RATE;
   const params = {
     invoiceId: uuid.v4(),
     companyId: user.companyId,
