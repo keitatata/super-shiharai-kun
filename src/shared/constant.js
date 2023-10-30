@@ -6,4 +6,7 @@ c.INVOICE_STATUS = {
   error: 'error',
 };
 
+c.DEFAULT_LIMIT = 10;
+c.DEFAULT_OFFSET = 0;
+
 module.exports = c;
