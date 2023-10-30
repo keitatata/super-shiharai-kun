@@ -10,13 +10,21 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Invoice.belongsTo(models.Client);
-      Invoice.belongsTo(models.Company);
+      Invoice.belongsTo(models.Client, {foreignKey: 'clientId', as: 'Client'});
+      Invoice.belongsTo(models.Company, {foreignKey: 'companyId', as: 'Company'});
     }
   }
   Invoice.init({
-    clientId: DataTypes.STRING,
-    companyId: DataTypes.STRING,
+    invoiceId: {
+      type: DataTypes.UUID,
+      primaryKey: true
+    },
+    clientId: {
+      type: DataTypes.UUID,
+    },
+    companyId: {
+      type: DataTypes.UUID,
+    },
     issuedAt: DataTypes.DATE,
     commission: DataTypes.INTEGER,
     commissionRate: DataTypes.INTEGER,
