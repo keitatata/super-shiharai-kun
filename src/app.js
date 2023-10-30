@@ -13,10 +13,14 @@ const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault(DEFAULT_TIME_ZONE);
+const expressErrorhandlers = require('express-errorhandlers');
+const logger = require('morgan');
+const {errorHandler, notFound, skipOkHandler} = expressErrorhandlers.middleware;
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+app.use(logger('combined'));
 
 app.use(passwordVerify)
 app.use(addNow)
@@ -109,5 +113,11 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
+app.use(errorHandler({
+  final: (req, res, handler) => {
+    if (handler.status >= 500) {
+      console.error(handler.error.stack);
+    }
+  },
+}));
 module.exports = app;
