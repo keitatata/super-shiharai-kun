@@ -2,16 +2,24 @@ const express = require('express')
 const createError = require('http-errors')
 const app = express()
 const port = 8080;
+const clientRepository = require('./shared/repositories/clients');
 const invoiceRepository = require('./shared/repositories/invoices');
-const { DEFAULT_LIMIT, DEFAULT_OFFSET } = require('./shared/constant');
-const { passwordVerify } = require('./shared/middlewares');
+const { DEFAULT_LIMIT, DEFAULT_OFFSET, INVOICE_STATUS, DEFAULT_TIME_ZONE, TAX_RATE, COMISSION_RATE } = require('./shared/constant');
+const { passwordVerify, addNow } = require('./shared/middlewares');
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
 app.use(passwordVerify)
+app.use(addNow)
 
+app.use(express.json());
+app.use(express.urlencoded({
+    extended: true
+}));
+
+// 請求書一覧取得
 app.get('/api/invoices', async (req, res) => {
   const { limit = DEFAULT_LIMIT, offset = DEFAULT_OFFSET } = req.query;
   const { companyId } = req._context.user
@@ -19,6 +27,31 @@ app.get('/api/invoices', async (req, res) => {
   // ユーザーが所属している企業の請求書で絞る
   const invoices = await invoiceRepository.findAll({ where: { companyId }, limit, offset });
   res.json(invoices);
+})
+
+// 請求書作成
+app.post('/api/invoices', async (req, res) => {
+  const { user, now } = req._context;
+  const { clientId, paymentAmount } = req.body;
+  // clientIdがstring, paymentAmountがnumberでなければエラー
+  if (typeof clientId !== 'string' || typeof paymentAmount !== 'number') {
+    res.status(400).json({ message: 'invalid request.' });
+    return;
+  }
+  // ユーザーが所属している企業のクライアントであるかをチェックする
+  const conditions = { where: { clientId, companyId: user.companyId }, raw: true }
+  const client = await clientRepository.findOne(conditions);
+  if (!client) {
+    res.status(400).json({ message: 'client is not found.' });
+    return;
+  }
+  await invoiceRepository.create({
+    companyId: user.companyId,
+    now,
+    clientId,
+    paymentAmount,
+  });
+  res.status(201).end();
 })
 
 // view engine setup

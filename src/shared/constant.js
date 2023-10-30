@@ -8,5 +8,9 @@ c.INVOICE_STATUS = {
 
 c.DEFAULT_LIMIT = 10;
 c.DEFAULT_OFFSET = 0;
+c.DEFAULT_TIME_ZONE = 'Asia/Tokyo';
+
+c.TAX_RATE = 0.10;
+c.COMISSION_RATE = 0.04;
 
 module.exports = c;
