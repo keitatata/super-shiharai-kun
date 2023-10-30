@@ -3,7 +3,7 @@
     "username": "user",
     "password": "password",
     "database": "local_super_shiharai_kun",
-    "host": "127.0.0.1",
+    "host": "mysql",
     "dialect": "mysql"
   },
   "test": {
