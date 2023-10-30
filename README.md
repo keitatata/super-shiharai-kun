@@ -1,20 +1,24 @@
 # super-shiharai-kun
 
 ## 🚗 Quick Start
-apiを実行可能な状態にします。
-### 1.サーバー起動
+### 1.ライブラリをインストール
 ```sh
-$ docker-compose up
+npm i
 ```
-### 2.モデルマイグレーション
+
+### 2.サーバー起動
+```sh
+docker-compose up
+```
+### 3.モデルマイグレーション
 
 ```sh
 npm run migrate
 ```
 
-### 3.seedデータ反映
+### 4.seedデータ反映
 ```
-  npx sequelize-cli db:seed:all --env localHost
+npx sequelize-cli db:seed:all --env localHost
 ```
 
 ## apiサンプル
