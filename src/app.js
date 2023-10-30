@@ -74,7 +74,7 @@ app.post('/api/invoices', async (req, res) => {
   const { clientId, paymentAmount } = req.body;
   // clientIdがstring, paymentAmountがnumberでなければエラー
   if (typeof clientId !== 'string' || typeof paymentAmount !== 'number') {
-    res.status(400).json({ message: 'invalid request.' });
+    res.status(400).json({ message: 'invalid request body param' });
     return;
   }
   // ユーザーが所属している企業のクライアントであるかをチェックする
