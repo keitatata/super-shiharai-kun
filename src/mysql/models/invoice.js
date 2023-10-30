@@ -20,13 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true
     },
     clientId: {
-      // references: {
-      //   model: {
-      //     tableName: 'Clients',
-      //     schema: 'schema'
-      //   },
-      //   key: 'clientId'
-      // },
       type: DataTypes.UUID,
     },
     companyId: {
