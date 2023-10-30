@@ -1,5 +1,5 @@
 'use strict';
-const { faker } = require('@faker-js/faker');
+// const { faker } = require('@faker-js/faker');
 
 // const _genSeeds = () => {
 //   const companies = [];
@@ -29,8 +29,8 @@ module.exports = {
       phone: '00000000000',
       postCode: 'test',
       address: 'test',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: '2023-08-30 17:41:54',
+      updatedAt: '2023-08-30 17:41:54'
     }]);
   },
 
