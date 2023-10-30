@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "npx nodemon ./src/app.js",
-    "migrate": "npx sequelize-cli db:migrate --env local",
-    "migrate:undo": "npx sequelize-cli db:migrate:undo --env local",
+    "migrate": "npx sequelize-cli db:migrate --env localHost",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo --env localHost",
     "test": "SERVICE_PORT=8090 jest --forceExit --runInBand"
   },
   "author": "",
