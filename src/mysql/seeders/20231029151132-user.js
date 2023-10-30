@@ -1,5 +1,5 @@
 'use strict';
-const { faker } = require('@faker-js/faker');
+const bcrypt = require('bcrypt');
 
 // const _genSeeds = () => {
 //   const users = [];
@@ -18,12 +18,15 @@ const { faker } = require('@faker-js/faker');
 // };
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hash = bcrypt.hashSync('password1', salt);
     return queryInterface.bulkInsert('Users', [{
       companyId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
       userId: 'fe8e9c4e-8ee6-4903-8b54-be57fcb29e40',
-      email: 'Stephany_Rogahn@yahoo.com',
-      password: 'test',
+      email: 'test@example.com',
+      password: hash,
       createdAt: '2023-08-30 17:41:54',
       updatedAt: '2023-08-30 17:41:54'
     }]);
